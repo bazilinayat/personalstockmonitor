@@ -1,4 +1,4 @@
-﻿using POSRestaurant.Models;
+﻿using StockMonitor.Models;
 using System.ComponentModel;
 using System.Reflection;
 

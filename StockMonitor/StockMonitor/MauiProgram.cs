@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
-using POSRestaurant.DBO;
-using Microsoft.Maui.LifecycleEvents;
+using StockMonitor.Controls;
+using StockMonitor.DBO;
+using StockMonitor.Services;
+using StockMonitor.ViewModels;
 
 namespace StockMonitor
 {
@@ -10,6 +12,8 @@ namespace StockMonitor
     {
         public static MauiApp CreateMauiApp()
         {
+            Environment.CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
@@ -24,21 +28,31 @@ namespace StockMonitor
     		builder.Logging.AddDebug();
 #endif
 
-            builder.Services.AddSingleton<DatabaseService>();
+            string logFilePath = Path.Combine(AppContext.BaseDirectory, "logs");
 
-            //// Force initialize Windows App Runtime components
-            //if (OperatingSystem.IsWindows())
-            //{
-            //    builder.ConfigureLifecycleEvents(events =>
-            //    {
-            //        events.AddWindows(windows => windows
-            //            .OnWindowCreated(window =>
-            //            {
-            //                window.ExtendsContentIntoTitleBar = false;
-            //            })
-            //        );
-            //    });
-            //}
+            builder.Services.AddSingleton(new LogService(logFilePath));
+
+            builder.Services.AddSingleton<DatabaseService>()
+                .AddSingleton<LoadDataPopup>()
+
+                .AddSingleton<StockMonitor.Pages.MainPage>()
+
+                .AddSingleton<LoadDataViewModel>()
+                .AddSingleton<MainPageViewModel>();
+
+            // force initialize windows app runtime components
+            if (OperatingSystem.IsWindows())
+            {
+                builder.ConfigureLifecycleEvents(events =>
+                {
+                    events.AddWindows(windows => windows
+                        .OnWindowCreated(window =>
+                        {
+                            window.ExtendsContentIntoTitleBar = false;
+                        })
+                    );
+                });
+            }
 
             return builder.Build();
         }

@@ -59,6 +59,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250916003" />
 		<PackageReference Include="Serilog" Version="4.3.0" />
 		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
@@ -67,8 +68,21 @@
 
 	<ItemGroup>
 	  <Folder Include="Converters\" />
-	  <Folder Include="ViewModels\" />
-	  <Folder Include="Pages\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Controls\LoadDataPopup.xaml.cs">
+	    <DependentUpon>LoadDataPopup.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Controls\LoadDataPopup.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\MainPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>

@@ -1,9 +1,8 @@
 ﻿using SQLite;
 using StockMonitor.Data;
-using StockMonitor.DBO;
 using StockMonitor.Service;
 
-namespace POSRestaurant.DBO
+namespace StockMonitor.DBO
 {
     /// <summary>
     /// Class to connect and talk to our database
