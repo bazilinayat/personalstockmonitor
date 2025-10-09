@@ -1,0 +1,108 @@
+﻿<Window x:Class="StockMonitor.Views.LoadDataWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:StockMonitor.Views"
+        xmlns:helper="clr-namespace:StockMonitor.Helper"
+        mc:Ignorable="d"
+        Title="LoadDataWindow" 
+        Height="450" 
+        Width="800"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="SingleBorderWindow"
+        ShowInTaskbar="False"
+        AllowsTransparency="False"
+        Topmost="True">
+
+    <Window.Resources>
+        <helper:OptionToBooleanMultiConverter x:Key="OptionToBooleanMultiConverter" />
+    </Window.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <!-- Checkboxes -->
+                <ColumnDefinition Width="3*" />
+                <!-- Text area -->
+                <ColumnDefinition Width="Auto" />
+                <!-- Buttons -->
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Heading -->
+            <TextBlock Grid.ColumnSpan="3"
+                       Text="Load New Data"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       Margin="0,0,0,20"/>
+
+            <!-- Left: Checkbox List -->
+            <StackPanel Grid.Row="1" Orientation="Vertical" VerticalAlignment="Top" Margin="0,0,20,0">
+                <!--<ItemsControl ItemsSource="{Binding Options}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="0,5">
+                                <RadioButton IsChecked="{Binding IsChecked}" Content="{Binding Name}" Tag="{Binding Id}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>-->
+
+                <ItemsControl ItemsSource="{Binding Options}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="0,5">
+                                <RadioButton
+                                    GroupName="OptionsGroup" 
+                                    Content="{Binding Name}"
+                                    Command="{Binding DataContext.SelectOptionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding}">
+                                    <RadioButton.IsChecked>
+                                        <MultiBinding Converter="{StaticResource OptionToBooleanMultiConverter}" Mode="TwoWay">
+                                            <Binding Path="DataContext.SelectedOption" RelativeSource="{RelativeSource AncestorType=Window}" />
+                                            <Binding Path="." />
+                                            <!-- explicitly current OptionItem -->
+                                        </MultiBinding>
+                                    </RadioButton.IsChecked>
+                                </RadioButton>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <!-- Center: Text Area -->
+            <StackPanel Grid.Column="1" Grid.Row="1" VerticalAlignment="Stretch">
+                <TextBox Text="{Binding CompanyText}"
+                         AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto"
+                         Height="200"
+                         Width="300"
+                         TextWrapping="Wrap"
+                         Margin="0,0,0,10"/>
+                <TextBlock Text="Note: Put company names with newline separations"
+                           FontStyle="Italic"
+                           Foreground="Gray"/>
+            </StackPanel>
+
+            <!-- Right: Buttons -->
+            <StackPanel Grid.Column="2" Grid.Row="1" VerticalAlignment="Top" Margin="20,0,0,0">
+                <Button Content="Upload"
+                        Width="100"
+                        Margin="0,0,0,10"
+                        Command="{Binding UploadCommand}"/>
+                <Button Content="Cancel"
+                        Width="100"
+                        Click="CancelButton_Click"/>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+
+</Window>
