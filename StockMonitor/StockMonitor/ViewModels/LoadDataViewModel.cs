@@ -1,9 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using StockMonitor.Core;
+using StockMonitor.Data;
 using StockMonitor.Models;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Shapes;
 
 namespace StockMonitor.ViewModels
 {
@@ -70,7 +73,7 @@ namespace StockMonitor.ViewModels
             _db = db;
             _logger = logger;
 
-            UploadCommand = new RelayCommand(UploadData);
+            UploadCommand = new AsyncRelayCommand(UploadDataAsync);
             SelectOptionCommand = new RelayCommand<OptionItem>(opt => SelectedOption = opt);
         }
 
@@ -88,6 +91,10 @@ namespace StockMonitor.ViewModels
             {
                 Options.Add(new OptionItem { Id = type.Id, Name = type.Name });
             }
+
+
+            SelectedOption = null;
+            CompanyText = "";
         }
 
         /// <summary>
@@ -95,22 +102,44 @@ namespace StockMonitor.ViewModels
         /// split the company names by new line
         /// upload for the selected type
         /// </summary>
-        private void UploadData()
+        private async Task UploadDataAsync()
         {
-            // Split text by new line
-            var selected = SelectedOption?.Name ?? "No Option Selected";
-            var lines = (CompanyText ?? string.Empty)
-                        .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            try
+            {
+                if (SelectedOption == null)
+                {
+                    MessageBox.Show($"Select a Type to upload", "Information", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
-            System.Diagnostics.Debug.WriteLine($"Selected Option: {selected}");
-            foreach (var l in lines)
-                System.Diagnostics.Debug.WriteLine($"To insert: {l}");
+                if (string.IsNullOrEmpty(CompanyText))
+                {
+                    MessageBox.Show($"Add Company names with new lines", "Information", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
-            Console.WriteLine("\nCompanies to Upload:");
-            foreach (var company in lines)
-                Console.WriteLine($"  {company}");
+                var lines = CompanyText.ToUpper().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-            MessageBox.Show($"Uploaded {lines.Length} companies.", "Upload Complete");
+                List<CompanyDetails> detailsToSave = new List<CompanyDetails>();
+                foreach (var line in lines)
+                    detailsToSave.Add(new CompanyDetails
+                    {
+                        Name = line,
+                        Symbol = line,
+                        TypeId = SelectedOption.Id
+                    });
+
+                await _db.CompanyDetailsOperation.DeleteAllCompanyDetailsItemAsync(SelectedOption.Id);
+
+                await _db.CompanyDetailsOperation.SaveCompanyDetailsAsync(detailsToSave);
+
+                MessageBox.Show($"Uploaded {lines.Length} companies.", "Upload Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("LoadDataViewModel - UploadDataAsync", ex);
+                MessageBox.Show($"Error in uploading", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

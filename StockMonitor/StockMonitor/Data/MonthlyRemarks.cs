@@ -16,17 +16,17 @@ namespace StockMonitor.Data
         public Guid MRId { get; set; } = Guid.NewGuid();
 
         /// <summary>
-        /// This is the ChartRemarks Id this remark corresponds to
-        /// Serves as a foreign key to ChartRemarks
+        /// This is the CompanyDetail Id this remark corresponds to
+        /// Serves as a foreign key to CompanyDetails
         /// </summary>
-        [ForeignKey(typeof(ChartRemarks))]
-        public Guid CRId { get; set; }
+        [ForeignKey(typeof(CompanyDetails))]
+        public Guid CDId { get; set; }
 
         /// <summary>
         /// Object corresponding to the foreign key
         /// </summary>
         [ManyToOne]
-        public ChartRemarks CompanyDetail { get; set; }
+        public CompanyDetails CompanyDetail { get; set; }
 
         /// <summary>
         /// The date on which the remark was made

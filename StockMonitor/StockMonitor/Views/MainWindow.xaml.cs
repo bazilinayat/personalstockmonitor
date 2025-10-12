@@ -1,18 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
+using StockMonitor.Models;
 using StockMonitor.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace StockMonitor.Views
 {
@@ -46,6 +36,65 @@ namespace StockMonitor.Views
             DataContext = _viewModel;
 
             _logger.LogInformation("MainWindow initialized");
+
+            Initialize();
+        }
+
+        /// <summary>
+        /// To initialize the data on the window
+        /// </summary>
+        /// <returns></returns>
+        private async void Initialize()
+        {
+            await _viewModel.InitializeData();
+        }
+
+        /// <summary>
+        /// The double click event for the items in daily list
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender is ListView listView && listView.SelectedItem is OptionItem selectedCompany)
+            {
+                if (DataContext is MainViewModel vm)
+                {
+                    vm.MarkDailyResult(selectedCompany);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The double click event for the items in weekly list
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ListView_MouseDoubleClick_1(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender is ListView listView && listView.SelectedItem is OptionItem selectedCompany)
+            {
+                if (DataContext is MainViewModel vm)
+                {
+                    vm.MarkWeeklyResult(selectedCompany);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The double click event for the items in monthly list
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ListView_MouseDoubleClick_2(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender is ListView listView && listView.SelectedItem is OptionItem selectedCompany)
+            {
+                if (DataContext is MainViewModel vm)
+                {
+                    vm.MarkMonthlyResult(selectedCompany);
+                }
+            }
         }
     }
 }

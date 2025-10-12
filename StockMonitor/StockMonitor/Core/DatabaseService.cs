@@ -43,11 +43,6 @@ namespace StockMonitor.Core
         public CompanyDetailsOperations CompanyDetailsOperation;
 
         /// <summary>
-        /// To handle calls to ChartRemarksOperations in the db
-        /// </summary>
-        public ChartRemarksOperations ChartRemarksOperation;
-
-        /// <summary>
         /// To handle calls to DailyRemarksOperations in the db
         /// </summary>
         public DailyRemarksOperations DailyRemarksOperation;
@@ -111,7 +106,6 @@ namespace StockMonitor.Core
             TypesOperation = new TypesOperations(_connection);
             UploadHistoryOperation = new UploadHistoryOperations(_connection);
             CompanyDetailsOperation = new CompanyDetailsOperations(_connection);
-            ChartRemarksOperation = new ChartRemarksOperations(_connection);
             DailyRemarksOperation = new DailyRemarksOperations(_connection);
             WeeklyRemarksOperation = new WeeklyRemarksOperations(_connection);
             MonthlyRemarksOperation = new MonthlyRemarksOperations(_connection);
@@ -125,7 +119,6 @@ namespace StockMonitor.Core
                 typeof(Types),
                 typeof(UploadHistory),
                 typeof(CompanyDetails),
-                typeof(ChartRemarks),
                 typeof(DailyRemarks),
                 typeof(WeeklyRemarks),
                 typeof(MonthlyRemarks),

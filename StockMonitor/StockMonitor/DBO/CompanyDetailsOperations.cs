@@ -26,7 +26,7 @@ namespace StockMonitor.DBO
         /// Get all the CompanyDetails
         /// </summary>
         /// <returns>A list of CompanyDetails</returns>
-        public async Task<List<CompanyDetails>> GetAllTypes() =>
+        public async Task<List<CompanyDetails>> GetAllCompanyDetails() =>
             await _connection.Table<CompanyDetails>().ToListAsync();
 
         /// <summary>
@@ -52,6 +52,17 @@ namespace StockMonitor.DBO
         /// <returns>Returns a list of company details</returns>
         public async Task<List<CompanyDetails>> GetCompanyDetailBySearch(string searchText) =>
             await _connection.Table<CompanyDetails>().Where(o => o.Symbol.Contains(searchText) || o.Name.ToLower().Contains(searchText.ToLower())).ToListAsync();
+
+        /// <summary>
+        /// To Get company detail by name thorugh searching in database
+        /// For a specific type
+        /// </summary>
+        /// <param name="typeId">Id to be searched</param>
+        /// <param name="searchText">The company symbol to search</param>
+        /// <returns>Returns a list of company details</returns>
+        public async Task<List<CompanyDetails>> GetCompanyDetailByTypeSearch(Guid typeId, string searchText) =>
+            await _connection.Table<CompanyDetails>().Where(o => o.TypeId == typeId && (o.Symbol.Contains(searchText) || o.Name.ToLower().Contains(searchText.ToLower()))).ToListAsync();
+
 
         /// <summary>
         /// Method to save the CompanyDetails in DB

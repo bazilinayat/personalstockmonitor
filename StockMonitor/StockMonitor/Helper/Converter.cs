@@ -78,4 +78,27 @@ namespace StockMonitor.Helper
             return new object[] { Binding.DoNothing, Binding.DoNothing };
         }
     }
+
+    public class CountToBoolConverter : IValueConverter
+    {
+        // Converts a collection's Count (or any numeric value) to a bool
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return false;
+
+            if (value is int count)
+                return count > 0;
+
+            // If it's a collection
+            if (value is System.Collections.ICollection collection)
+                return collection.Count > 0;
+
+            return false;
+        }
+
+        // Not needed for one-way binding
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => throw new NotImplementedException();
+    }
 }

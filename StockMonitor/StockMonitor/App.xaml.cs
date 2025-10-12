@@ -65,10 +65,12 @@ namespace StockMonitor
                         // ViewModels
                         services.AddSingleton<MainViewModel>();
                         services.AddSingleton<LoadDataViewModel>();
+                        services.AddSingleton<RemarkViewModel>();
 
                         // Views
                         services.AddSingleton<MainWindow>();
                         services.AddSingleton<LoadDataWindow>();
+                        services.AddSingleton<RemarkWindow>();
                     })
                     .Build();
 

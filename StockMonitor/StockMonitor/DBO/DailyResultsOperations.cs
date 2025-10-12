@@ -36,13 +36,7 @@ namespace StockMonitor.DBO
         /// <returns>list of DailyResults</returns>
         public async Task<List<DailyResults>> GetDailyResultsBasedOnCompanyId(Guid companyId)
         {
-            List<ChartRemarks> listOfCharts = await _connection.Table<ChartRemarks>().Where(o => o.CDId == companyId).ToListAsync();
-            if (listOfCharts.Count == 0)
-                return null;
-
-            List<Guid> chartGuidsToSearch = listOfCharts.Select(o => o.CRId).ToList();
-
-            List<DailyRemarks> dailyRemarks = await _connection.Table<DailyRemarks>().Where(o => chartGuidsToSearch.Contains(o.CRId)).ToListAsync();
+            List<DailyRemarks> dailyRemarks = await _connection.Table<DailyRemarks>().Where(o => o.CDId == companyId).ToListAsync();
             if (dailyRemarks.Count == 0)
                 return null;
 

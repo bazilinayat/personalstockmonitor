@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using StockMonitor.Core;
+using StockMonitor.Data;
+using StockMonitor.Models;
 using StockMonitor.Views;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -23,53 +26,63 @@ namespace StockMonitor.ViewModels
         private readonly ILogger<MainViewModel> _logger;
 
         /// <summary>
-        /// The type options, will come from database
+        /// The database service to be used for operations
         /// </summary>
-        public ObservableCollection<string> TypeOptions { get; } = new()
-        {
-            "Type A", "Type B", "Type C"
-        };
+        private readonly DatabaseService _db;
 
         /// <summary>
-        /// The type which is selected for checking
+        /// The type options, will come from database
         /// </summary>
-        private string _selectedType;
+        public ObservableCollection<OptionItem> TypeOptions { get; } = new();
         /// <summary>
-        /// The active selected type
+        /// The company options, will come from database
         /// </summary>
-        public string SelectedType
+        public ObservableCollection<OptionItem> CompanyOptions { get; } = new();
+
+        /// <summary>
+        /// The selected option
+        /// </summary>
+        private OptionItem? _selectedType;
+        /// <summary>
+        /// the selection option for public use
+        /// </summary>
+        public OptionItem? SelectedOption
         {
             get => _selectedType;
-            set => SetProperty(ref _selectedType, value);
+            set
+            {
+                SetProperty(ref _selectedType, value);
+                _ = LoadCompaniesAsync();
+            }
         }
 
         /// <summary>
         /// The query or company name for search
         /// </summary>
-        private string _searchQuery;
+        private OptionItem _selectedCompany;
         /// <summary>
         /// The actual query typed
         /// </summary>
-        public string SearchQuery
+        public OptionItem SelectedCompanyKey
         {
-            get => _searchQuery;
-            set => SetProperty(ref _searchQuery, value);
+            get => _selectedCompany;
+            set => SetProperty(ref _selectedCompany, value);
         }
 
         /// <summary>
         /// The list of companies to check today in daily frame
         /// </summary>
-        public ObservableCollection<string> DailyCompanies { get; } = new();
+        public ObservableCollection<OptionItem> DailyCompanies { get; } = new();
 
         /// <summary>
         /// The list of companies to check today in weekly frame
         /// </summary>
-        public ObservableCollection<string> WeeklyCompanies { get; } = new();
+        public ObservableCollection<OptionItem> WeeklyCompanies { get; } = new();
 
         /// <summary>
         /// The list of companies to check today in monthly frame
         /// </summary>
-        public ObservableCollection<string> MonthlyCompanies { get; } = new();
+        public ObservableCollection<OptionItem> MonthlyCompanies { get; } = new();
 
         /// <summary>
         /// The current date to display and use
@@ -100,16 +113,21 @@ namespace StockMonitor.ViewModels
         /// the command to open monthly timeframe report
         /// </summary>
         public ICommand MonthlyReportCommand { get; }
+        /// <summary>
+        /// The command to refresh the info on the page
+        /// </summary>
+        public ICommand RefreshCommand { get; }
 
         /// <summary>
         /// Constructor to bind and initialize
         /// </summary>
         /// <param name="serviceProvider">DIed ServiceProvider</param>
         /// <param name="logger">DIed logger</param>
-        public MainViewModel(IServiceProvider serviceProvider, ILogger<MainViewModel> logger)
+        public MainViewModel(IServiceProvider serviceProvider, ILogger<MainViewModel> logger, DatabaseService db)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
+            _db = db;
 
             _logger.LogInformation("MainViewModel initialized at {Time}", DateTime.Now);
 
@@ -119,6 +137,90 @@ namespace StockMonitor.ViewModels
             DailyReportCommand = new RelayCommand(() => LoadReport("Daily"));
             WeeklyReportCommand = new RelayCommand(() => LoadReport("Weekly"));
             MonthlyReportCommand = new RelayCommand(() => LoadReport("Monthly"));
+            RefreshCommand = new AsyncRelayCommand(RefreshAsync);
+        }
+
+        /// <summary>
+        /// To initialize the data from db and other sources
+        /// </summary>
+        /// <returns></returns>
+        public async ValueTask InitializeData()
+        {
+            TypeOptions.Clear();
+
+            var types = await _db.TypesOperation.GetAllTypes();
+            foreach (var type in types)
+            {
+                TypeOptions.Add(new OptionItem { Id = type.Id, Name = type.Name });
+            }
+            if (TypeOptions.Any())
+                SelectedOption = TypeOptions.First();
+
+            await RefreshAsync();
+        }
+
+        /// <summary>
+        /// To load the list of companies to check for remarks today
+        /// </summary>
+        /// <returns>Task</returns>
+        private async Task RefreshAsync()
+        {
+            _logger.LogInformation("Refreshing charts at {Time}", DateTime.Now);
+
+            DailyCompanies.Clear();
+            WeeklyCompanies.Clear();
+            MonthlyCompanies.Clear();
+
+            var companies = await _db.CompanyDetailsOperation.GetAllCompanyDetails();
+
+            var dailyToCheck = await _db.DailyRemarksOperation.GetDailyRemarksToCheckToday();
+            foreach (var daily in dailyToCheck)
+            {
+                DailyCompanies.Add(new OptionItem
+                {
+                    Id = daily.DRId,
+                    Name = companies.FirstOrDefault(o => o.CDId == daily.CDId)?.Name ?? ""
+                });
+            }
+
+            var weeklyToCheck = await _db.WeeklyRemarksOperation.GetWeeklyRemarksToCheckToday();
+            foreach (var weekly in weeklyToCheck)
+            {
+                WeeklyCompanies.Add(new OptionItem
+                {
+                    Id = weekly.WRId,
+                    Name = companies.FirstOrDefault(o => o.CDId == weekly.CDId)?.Name ?? ""
+                });
+            }
+
+            var monthlyToCheck = await _db.MonthlyRemarksOperation.GetMonthlyRemarksToCheckToday();
+            foreach (var monthly in monthlyToCheck)
+            {
+                MonthlyCompanies.Add(new OptionItem
+                {
+                    Id = monthly.MRId,
+                    Name = companies.FirstOrDefault(o => o.CDId == monthly.CDId)?.Name ?? ""
+                });
+            }
+        }
+
+        /// <summary>
+        /// To load the list of companies based on the type selection
+        /// </summary>
+        /// <returns>Task</returns>
+        private async Task LoadCompaniesAsync()
+        {
+            CompanyOptions.Clear();
+
+            if (SelectedOption == null)
+                return;
+
+            var companies = await _db.CompanyDetailsOperation.GetCompanyDetailsBasedOnTypeId(SelectedOption.Id);
+            foreach (var c in companies)
+                CompanyOptions.Add(new OptionItem { Id = c.CDId, Name = c.Symbol });
+
+            if (CompanyOptions.Count > 0)
+                SelectedCompanyKey = CompanyOptions.First();
         }
 
         /// <summary>
@@ -128,9 +230,16 @@ namespace StockMonitor.ViewModels
         /// </summary>
         private void OnSearch()
         {
-            // Example logic
-            DailyCompanies.Clear();
-            DailyCompanies.Add($"Searched: {SearchQuery} in {SelectedType}");
+
+            if (SelectedOption == null) return;
+            if (SelectedCompanyKey == null) return;
+
+            var viewModel = _serviceProvider.GetRequiredService<RemarkViewModel>();
+            viewModel.SelectedOption = SelectedOption;
+            viewModel.SelectedCompany = SelectedCompanyKey;
+            var window = new RemarkWindow(viewModel);
+
+            window.ShowDialog();
         }
 
         /// <summary>
@@ -142,7 +251,6 @@ namespace StockMonitor.ViewModels
         {
             // Example logic
             WeeklyCompanies.Clear();
-            WeeklyCompanies.Add("Random Corp Ltd");
         }
 
         /// <summary>
@@ -165,7 +273,75 @@ namespace StockMonitor.ViewModels
         private void LoadReport(string type)
         {
             // Example logic
-            DailyCompanies.Add($"{type} Report Loaded");
+        }
+
+        /// <summary>
+        /// To open the mark result popup for daily chart
+        /// </summary>
+        /// <param name="company">The company remark that was selected</param>
+        public void MarkDailyResult(OptionItem company)
+        {
+            if (company == null) return;
+
+            _logger.LogInformation("Opening detail for {Company}", company.Name);
+
+            var viewModel = _serviceProvider.GetRequiredService<RemarkViewModel>();
+            viewModel.SelectedCompany = company;
+
+            // You can decide which type to use here — Daily/Weekly/Monthly
+            viewModel.SelectedOption = new OptionItem { Name = "Daily" };
+
+            var window = new RemarkWindow(viewModel)
+            {
+                Owner = Application.Current.MainWindow
+            };
+            window.ShowDialog();
+        }
+
+        /// <summary>
+        /// To open the mark result popup for weekly chart
+        /// </summary>
+        /// <param name="company">The company remark that was selected</param>
+        public void MarkWeeklyResult(OptionItem company)
+        {
+            if (company == null) return;
+
+            _logger.LogInformation("Opening detail for {Company}", company.Name);
+
+            var viewModel = _serviceProvider.GetRequiredService<RemarkViewModel>();
+            viewModel.SelectedCompany = company;
+
+            // You can decide which type to use here — Daily/Weekly/Monthly
+            viewModel.SelectedOption = new OptionItem { Name = "Daily" };
+
+            var window = new RemarkWindow(viewModel)
+            {
+                Owner = Application.Current.MainWindow
+            };
+            window.ShowDialog();
+        }
+
+        /// <summary>
+        /// To open the mark result popup for monthly chart
+        /// </summary>
+        /// <param name="company">The company remark that was selected</param>
+        public void MarkMonthlyResult(OptionItem company)
+        {
+            if (company == null) return;
+
+            _logger.LogInformation("Opening detail for {Company}", company.Name);
+
+            var viewModel = _serviceProvider.GetRequiredService<RemarkViewModel>();
+            viewModel.SelectedCompany = company;
+
+            // You can decide which type to use here — Daily/Weekly/Monthly
+            viewModel.SelectedOption = new OptionItem { Name = "Daily" };
+
+            var window = new RemarkWindow(viewModel)
+            {
+                Owner = Application.Current.MainWindow
+            };
+            window.ShowDialog();
         }
     }
 }

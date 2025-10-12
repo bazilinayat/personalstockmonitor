@@ -29,5 +29,14 @@ namespace StockMonitor.ViewModels
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        /// <summary>
+        /// To notify the UI of the change
+        /// </summary>
+        /// <param name="propertyName">property name to change</param>
+        protected void Notify(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

@@ -26,7 +26,7 @@ namespace StockMonitor.DBO
         /// Get all the DailyRemarks
         /// </summary>
         /// <returns>A list of DailyRemarks</returns>
-        public async Task<List<DailyRemarks>> GetAllTypes() =>
+        public async Task<List<DailyRemarks>> GetAllDailyRemarks() =>
             await _connection.Table<DailyRemarks>().ToListAsync();
 
         /// <summary>
@@ -36,12 +36,7 @@ namespace StockMonitor.DBO
         /// <returns>list of DailyRemarks</returns>
         public async Task<List<DailyRemarks>> GetDailyRemarksBasedOnCompanyId(Guid companyId)
         {
-            List<ChartRemarks> listOfCharts = await _connection.Table<ChartRemarks>().Where(o => o.CDId == companyId).ToListAsync();
-            if (listOfCharts.Count == 0)
-                return null;
-
-            List<Guid> guidsToSearch = listOfCharts.Select(o => o.CRId).ToList();
-            return await _connection.Table<DailyRemarks>().Where(o => guidsToSearch.Contains(o.CRId)).ToListAsync();
+            return await _connection.Table<DailyRemarks>().Where(o => o.CDId == companyId).ToListAsync();
         }
 
         /// <summary>
@@ -56,6 +51,19 @@ namespace StockMonitor.DBO
             var toDate = new DateTime(to.Year, to.Month, to.Day, 0, 0, 0);
 
             return await _connection.Table<DailyRemarks>().Where(o => o.RemarkDate >= fromDate && o.RemarkDate <= toDate).ToListAsync();
+        }
+
+        /// <summary>
+        /// Get all the DailyRemarks as that are to be checked today
+        /// </summary>
+        /// <returns>list of DailyRemarks</returns>
+        public async Task<List<DailyRemarks>> GetDailyRemarksToCheckToday()
+        {
+            var fromDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+            var tomorrow = DateTime.Now.AddDays(1);
+            var toDate = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 0, 0, 0);
+
+            return await _connection.Table<DailyRemarks>().Where(o => o.CheckDate >= fromDate && o.CheckDate < toDate && !o.IsChecked).ToListAsync();
         }
 
         /// <summary>
