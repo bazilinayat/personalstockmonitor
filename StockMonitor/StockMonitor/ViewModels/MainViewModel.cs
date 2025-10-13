@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using StockMonitor.Core;
 using StockMonitor.Data;
+using StockMonitor.Enums;
 using StockMonitor.Models;
 using StockMonitor.Views;
 using System.Collections.ObjectModel;
@@ -285,13 +286,11 @@ namespace StockMonitor.ViewModels
 
             _logger.LogInformation("Opening detail for {Company}", company.Name);
 
-            var viewModel = _serviceProvider.GetRequiredService<RemarkViewModel>();
-            viewModel.SelectedCompany = company;
+            var viewModel = _serviceProvider.GetRequiredService<SaveResultViewModel>();
+            viewModel.SelectedCompanyRemark = company;
+            viewModel.ChartType = ChartTypes.Daily;
 
-            // You can decide which type to use here — Daily/Weekly/Monthly
-            viewModel.SelectedOption = new OptionItem { Name = "Daily" };
-
-            var window = new RemarkWindow(viewModel)
+            var window = new SaveResultWindow(viewModel)
             {
                 Owner = Application.Current.MainWindow
             };
@@ -308,13 +307,11 @@ namespace StockMonitor.ViewModels
 
             _logger.LogInformation("Opening detail for {Company}", company.Name);
 
-            var viewModel = _serviceProvider.GetRequiredService<RemarkViewModel>();
-            viewModel.SelectedCompany = company;
+            var viewModel = _serviceProvider.GetRequiredService<SaveResultViewModel>();
+            viewModel.SelectedCompanyRemark = company;
+            viewModel.ChartType = ChartTypes.Weekly;
 
-            // You can decide which type to use here — Daily/Weekly/Monthly
-            viewModel.SelectedOption = new OptionItem { Name = "Daily" };
-
-            var window = new RemarkWindow(viewModel)
+            var window = new SaveResultWindow(viewModel)
             {
                 Owner = Application.Current.MainWindow
             };
@@ -331,13 +328,11 @@ namespace StockMonitor.ViewModels
 
             _logger.LogInformation("Opening detail for {Company}", company.Name);
 
-            var viewModel = _serviceProvider.GetRequiredService<RemarkViewModel>();
-            viewModel.SelectedCompany = company;
+            var viewModel = _serviceProvider.GetRequiredService<SaveResultViewModel>();
+            viewModel.SelectedCompanyRemark = company;
+            viewModel.ChartType = ChartTypes.Monthly;
 
-            // You can decide which type to use here — Daily/Weekly/Monthly
-            viewModel.SelectedOption = new OptionItem { Name = "Daily" };
-
-            var window = new RemarkWindow(viewModel)
+            var window = new SaveResultWindow(viewModel)
             {
                 Owner = Application.Current.MainWindow
             };

@@ -41,6 +41,6 @@ namespace StockMonitor.Data
         /// <summary>
         /// To hold the notes of the result
         /// </summary>
-        public string RemarkRemark { get; set; }
+        public string ResultRemarks { get; set; }
     }
 }

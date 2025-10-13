@@ -90,7 +90,7 @@ namespace StockMonitor.DBO
         /// </summary>
         /// <param name="details">DailyRemark to be saved</param>
         /// <returns>Error message string, null on success</returns>
-        public async Task<string?> SaveDailyRemarkAsync(WeeklyResults details)
+        public async Task<string?> SaveWeeklyResultAsync(WeeklyResults details)
         {
 
             if (await _connection.InsertAsync(details) > 0)

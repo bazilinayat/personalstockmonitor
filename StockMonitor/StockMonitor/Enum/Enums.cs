@@ -84,6 +84,9 @@ namespace StockMonitor.Enums
         Down = 1
     }
 
+    /// <summary>
+    /// To know what tha result is of the prediction remark made
+    /// </summary>
     public enum Results
     {
         /// <summary>
@@ -96,5 +99,27 @@ namespace StockMonitor.Enums
         /// </summary>
         [Description("Against")]
         Against = 1
+    }
+
+    /// <summary>
+    /// To know the chart types
+    /// </summary>
+    public enum ChartTypes
+    {
+        /// <summary>
+        /// To know if the chart is on daily time frame
+        /// </summary>
+        [Description("Daily")]
+        Daily,
+        /// <summary>
+        /// To know if the chart is on weekly time frame
+        /// </summary>
+        [Description("Weekly")]
+        Weekly,
+        /// <summary>
+        /// To know if the chart is on monthly time frame
+        /// </summary>
+        [Description("Monthly")]
+        Monthly
     }
 }
