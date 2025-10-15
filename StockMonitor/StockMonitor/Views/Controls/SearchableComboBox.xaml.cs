@@ -11,12 +11,17 @@ namespace StockMonitor.Views.Controls
     /// </summary>
     public partial class SearchableComboBox : UserControl
     {
+        /// <summary>
+        /// Constructor for the user control
+        /// </summary>
         public SearchableComboBox()
         {
             InitializeComponent();
         }
 
-        // 🔹 The full list to filter from
+        /// <summary>
+        /// The full list to filter from
+        /// </summary>
         public ObservableCollection<OptionItem> ItemsSource
         {
             get => (ObservableCollection<OptionItem>)GetValue(ItemsSourceProperty);
@@ -25,7 +30,9 @@ namespace StockMonitor.Views.Controls
         public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register(nameof(ItemsSource), typeof(ObservableCollection<OptionItem>), typeof(SearchableComboBox), new PropertyMetadata(null));
 
-        // 🔹 The selected item
+        /// <summary>
+        /// The selected item
+        /// </summary>
         public OptionItem SelectedItem
         {
             get => (OptionItem)GetValue(SelectedItemProperty);
@@ -34,7 +41,9 @@ namespace StockMonitor.Views.Controls
         public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register(nameof(SelectedItem), typeof(OptionItem), typeof(SearchableComboBox), new PropertyMetadata(null));
 
-        // 🔹 Search text binding
+        /// <summary>
+        /// Search text binding
+        /// </summary>
         public string SearchText
         {
             get => (string)GetValue(SearchTextProperty);
@@ -44,15 +53,25 @@ namespace StockMonitor.Views.Controls
             DependencyProperty.Register(nameof(SearchText), typeof(string), typeof(SearchableComboBox),
                 new PropertyMetadata(string.Empty, OnSearchTextChanged));
 
+        /// <summary>
+        /// Change event for search text changed
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="e"></param>
         private static void OnSearchTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = (SearchableComboBox)d;
             control.FilterItems();
         }
 
-        // 🔹 Filtered items collection
+        /// <summary>
+        /// Filtered items collection
+        /// </summary>
         public ObservableCollection<OptionItem> FilteredItems { get; } = new();
 
+        /// <summary>
+        /// To know if the popup is open
+        /// </summary>
         public bool IsPopupOpen
         {
             get => (bool)GetValue(IsPopupOpenProperty);
@@ -61,6 +80,9 @@ namespace StockMonitor.Views.Controls
         public static readonly DependencyProperty IsPopupOpenProperty =
             DependencyProperty.Register(nameof(IsPopupOpen), typeof(bool), typeof(SearchableComboBox), new PropertyMetadata(false));
 
+        /// <summary>
+        /// The filtered items in the suggestion list
+        /// </summary>
         private void FilterItems()
         {
             if (ItemsSource == null)
@@ -87,6 +109,11 @@ namespace StockMonitor.Views.Controls
             IsPopupOpen = FilteredItems.Any();
         }
 
+        /// <summary>
+        /// The mouseleft button click, to select one of the suggestions
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ListBox_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (sender is ListBox list && list.SelectedItem is OptionItem selected)
