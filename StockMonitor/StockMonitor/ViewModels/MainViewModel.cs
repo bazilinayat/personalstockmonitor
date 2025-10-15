@@ -64,10 +64,31 @@ namespace StockMonitor.ViewModels
         /// <summary>
         /// The actual query typed
         /// </summary>
-        public OptionItem SelectedCompanyKey
+        public OptionItem SelectedCompany
         {
             get => _selectedCompany;
             set => SetProperty(ref _selectedCompany, value);
+        }
+
+
+        private string _companySearchText;
+        public string CompanySearchText
+        {
+            get => _companySearchText;
+            set
+            {
+                SetProperty(ref _companySearchText, value);
+                _ = FilterCompaniesAsync(value);
+            }
+        }
+
+        public ObservableCollection<OptionItem> FilteredCompanies { get; } = new();
+
+        private bool _isSuggestionVisible;
+        public bool IsSuggestionVisible
+        {
+            get => _isSuggestionVisible;
+            set => SetProperty(ref _isSuggestionVisible, value);
         }
 
         /// <summary>
@@ -160,6 +181,29 @@ namespace StockMonitor.ViewModels
             await RefreshAsync();
         }
 
+        private async Task FilterCompaniesAsync(string searchText)
+        {
+            if (string.IsNullOrWhiteSpace(searchText) || searchText.Length < 3)
+            {
+                FilteredCompanies.Clear();
+                IsSuggestionVisible = false;
+                return;
+            }
+
+            await Task.Delay(100); // small debounce
+
+            var results = CompanyOptions
+                .Where(c => c.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                .Take(5)
+                .ToList();
+
+            FilteredCompanies.Clear();
+            foreach (var company in results)
+                FilteredCompanies.Add(company);
+
+            IsSuggestionVisible = FilteredCompanies.Count > 0;
+        }
+
         /// <summary>
         /// To load the list of companies to check for remarks today
         /// </summary>
@@ -221,7 +265,7 @@ namespace StockMonitor.ViewModels
                 CompanyOptions.Add(new OptionItem { Id = c.CDId, Name = c.Symbol });
 
             if (CompanyOptions.Count > 0)
-                SelectedCompanyKey = CompanyOptions.First();
+                SelectedCompany = CompanyOptions.First();
         }
 
         /// <summary>
@@ -233,11 +277,11 @@ namespace StockMonitor.ViewModels
         {
 
             if (SelectedOption == null) return;
-            if (SelectedCompanyKey == null) return;
+            if (SelectedCompany == null) return;
 
             var viewModel = _serviceProvider.GetRequiredService<RemarkViewModel>();
             viewModel.SelectedOption = SelectedOption;
-            viewModel.SelectedCompany = SelectedCompanyKey;
+            viewModel.SelectedCompany = SelectedCompany;
             var window = new RemarkWindow(viewModel);
 
             window.ShowDialog();
@@ -273,7 +317,13 @@ namespace StockMonitor.ViewModels
         /// <param name="type"></param>
         private void LoadReport(string type)
         {
-            // Example logic
+            var viewModel = _serviceProvider.GetRequiredService<ReportViewModel>();
+
+            var window = new ReportWindow(viewModel)
+            {
+                Owner = Application.Current.MainWindow
+            };
+            window.ShowDialog();
         }
 
         /// <summary>

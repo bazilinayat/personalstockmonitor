@@ -3,6 +3,7 @@ using StockMonitor.Models;
 using StockMonitor.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace StockMonitor.Views
 {
@@ -93,6 +94,19 @@ namespace StockMonitor.Views
                 if (DataContext is MainViewModel vm)
                 {
                     vm.MarkMonthlyResult(selectedCompany);
+                }
+            }
+        }
+
+        private void ListBox_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is ListBox listBox && listBox.SelectedItem is OptionItem selected)
+            {
+                if (DataContext is MainViewModel vm)
+                {
+                    vm.SelectedCompany = selected;
+                    vm.CompanySearchText = selected.Name;
+                    vm.IsSuggestionVisible = false;
                 }
             }
         }

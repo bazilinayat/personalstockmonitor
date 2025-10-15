@@ -69,7 +69,7 @@ namespace StockMonitor.DBO
             var fromDate = new DateTime(from.Year, from.Month, from.Day, 0, 0, 0);
             var toDate = new DateTime(to.Year, to.Month, to.Day, 0, 0, 0);
 
-            List<MonthlyRemarks> remarks = await _connection.Table<MonthlyRemarks>().Where(o => o.RemarkDate >= fromDate && o.RemarkDate <= toDate).ToListAsync();
+            List<MonthlyRemarks> remarks = await _connection.Table<MonthlyRemarks>().Where(o => o.RemarkDate >= fromDate && o.RemarkDate <= toDate && o.IsChecked).ToListAsync();
             if (remarks.Count == 0)
                 return null;
 

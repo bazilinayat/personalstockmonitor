@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="StockMonitor.Views.Controls.SearchableComboBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:StockMonitor.Views.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="30" d:DesignWidth="100">
+
+    <Grid>
+        <TextBox x:Name="SearchBox"
+                 Text="{Binding SearchText, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
+                 Padding="4"
+                 VerticalContentAlignment="Center"
+                 />
+
+        <Popup x:Name="PopupSuggestions"
+               Placement="Bottom"
+               StaysOpen="False"
+               AllowsTransparency="True"
+               PopupAnimation="Slide"
+               IsOpen="{Binding IsPopupOpen, RelativeSource={RelativeSource AncestorType=UserControl}}">
+            <Border Background="White"
+                    BorderBrush="LightGray"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    MinWidth="{Binding ActualWidth, ElementName=SearchBox}">
+                <ListBox ItemsSource="{Binding FilteredItems, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                         DisplayMemberPath="Name"
+                         MouseLeftButtonUp="ListBox_MouseLeftButtonUp"
+                         />
+            </Border>
+        </Popup>
+    </Grid>
+
+</UserControl>

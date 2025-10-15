@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StockMonitor.Views"
         xmlns:helper="clr-namespace:StockMonitor.Helper"
+        xmlns:controls="clr-namespace:StockMonitor.Views.Controls"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
@@ -64,22 +65,21 @@
                                       ItemsSource="{Binding TypeOptions}"
                                       SelectedValuePath="Id"
                                       DisplayMemberPath="Name"
-                                      SelectedItem="{Binding SelectedType}" Margin="0,0,10,0"/>
+                                      SelectedItem="{Binding SelectedOption, Mode=TwoWay}" 
+                                      Margin="0,0,10,0"/>
 
                             <!-- Company -->
                             <TextBlock Grid.Column="2" Text="Company:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <ComboBox Grid.Column="3" Width="150"
-                                  ItemsSource="{Binding CompanyOptions}"
-                                  SelectedValuePath="Id"
-                                  DisplayMemberPath="Name"
-                                  SelectedValue="{Binding SelectedCompanyKey, Mode=TwoWay}"
-                                  Margin="0,0,10,0"/>
+                            <controls:SearchableComboBox Grid.Column="3"
+                                                         Width="150"
+                                                         ItemsSource="{Binding CompanyOptions}"
+                                                         SelectedItem="{Binding SelectedCompany, Mode=TwoWay}"/>
 
-                            <Button Grid.Column="4" Content="Search"
+                            <Button Grid.Column="4" Content="Put Remark"
                                     Command="{Binding SearchCommand}" Width="80"/>
                         </Grid>
 
-                        <Grid>
+                        <!--<Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
@@ -87,16 +87,21 @@
                             <TextBlock Text="Random:" VerticalAlignment="Center" Margin="0,0,8,0"/>
                             <Button Grid.Column="1" Content="Random Search"
                                     Command="{Binding RandomSearchCommand}" Width="130"/>
-                        </Grid>
+                        </Grid>-->
                     </StackPanel>
                 </Border>
 
                 <!-- Second Section -->
                 <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="8" Padding="10">
-                    <StackPanel>
-                        <TextBlock Text="Data" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Data" 
+                                   FontWeight="Bold" 
+                                   VerticalAlignment="Center"/>
                         <Button Content="Load Data"
-                                Command="{Binding LoadDataCommand}" Width="100"/>
+                                Margin="20,0,0,0"
+                                Command="{Binding LoadDataCommand}" 
+                                Width="100"
+                                Height="20"/>
                     </StackPanel>
                 </Border>
             </StackPanel>
@@ -107,8 +112,6 @@
                     <TextBlock Text="Reports Check" FontWeight="Bold" Margin="0,0,0,10"/>
                     <StackPanel Orientation="Vertical" VerticalAlignment="Top" >
                         <Button Content="Daily Reports" Command="{Binding DailyReportCommand}" Margin="0,5,0,0"/>
-                        <Button Content="Weekly Reports" Command="{Binding WeeklyReportCommand}" Margin="0,5,0,0"/>
-                        <Button Content="Monthly Reports" Command="{Binding MonthlyReportCommand}" Margin="0,5,0,0"/>
                     </StackPanel>
                 </StackPanel>
             </Border>

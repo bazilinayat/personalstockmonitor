@@ -5,6 +5,7 @@ using StockMonitor.Enums;
 using StockMonitor.Models;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace StockMonitor.ViewModels
@@ -55,9 +56,66 @@ namespace StockMonitor.ViewModels
         public ObservableCollection<RemarkSection> RemarkSections { get; } = new();
 
         /// <summary>
+        /// The buy price entered by user
+        /// </summary>
+        private decimal _buyPrice;
+        /// <summary>
+        /// The public buy price for screen
+        /// </summary>
+        public decimal BuyPrice
+        {
+            get => _buyPrice;
+            set => SetProperty(ref _buyPrice, value);
+        }
+
+        /// <summary>
+        /// The sl value entered by user
+        /// </summary>
+        private decimal _slValue;
+        /// <summary>
+        /// The public sl value for screen
+        /// </summary>
+        public decimal SLValue
+        {
+            get => _slValue;
+            set => SetProperty(ref _slValue, value);
+        }
+
+        /// <summary>
+        /// The target value entered by user
+        /// </summary>
+        private decimal _targetValue;
+        /// <summary>
+        /// The public target value for screen
+        /// </summary>
+        public decimal TargetValue
+        {
+            get => _targetValue;
+            set => SetProperty(ref _targetValue, value);
+        }
+
+        /// <summary>
+        /// The calcualted RRR value to be displayed on screen
+        /// </summary>
+        private decimal _rrrCalculated;
+        /// <summary>
+        /// The public RRR for binding
+        /// </summary>
+        public decimal RRRCalculated
+        {
+            get => _rrrCalculated;
+            set => SetProperty(ref _rrrCalculated, value);
+        }
+
+        /// <summary>
         /// Command to save information
         /// </summary>
         public ICommand SaveCommand { get; }
+
+        /// <summary>
+        /// Command to calculate RRR
+        /// </summary>
+        public ICommand RRRCalculateCommand { get; }
 
         /// <summary>
         /// Command to close window
@@ -65,22 +123,17 @@ namespace StockMonitor.ViewModels
         public ICommand CancelCommand { get; }
 
         /// <summary>
-        /// 
+        /// Constructor for the view model to assigne important dependencies
         /// </summary>
-        /// <param name="db"></param>
-        /// <param name="window"></param>
-        /// <param name="option"></param>
-        /// <param name="company"></param>
+        /// <param name="db">DIed DatabaseService</param>
+        /// <param name="logger">DIed Logger</param>
         public RemarkViewModel(DatabaseService db, ILogger<RemarkViewModel> logger)
         {
             _db = db;
             _logger = logger;
 
-            RemarkSections.Add(new RemarkSection("Daily"));
-            RemarkSections.Add(new RemarkSection("Weekly"));
-            RemarkSections.Add(new RemarkSection("Monthly"));
-
             SaveCommand = new AsyncRelayCommand(SaveAsync);
+            RRRCalculateCommand = new RelayCommand(CalculateRRR);
         }
 
 
@@ -90,6 +143,37 @@ namespace StockMonitor.ViewModels
         /// <returns>Task</returns>
         public async Task InitializeData()
         {
+            RemarkSections.Clear();
+            RemarkSections.Add(new RemarkSection("Daily"));
+            RemarkSections.Add(new RemarkSection("Weekly"));
+            RemarkSections.Add(new RemarkSection("Monthly"));
+        }
+
+        /// <summary>
+        /// To calculate the RRR for given values
+        /// </summary>
+        private void CalculateRRR()
+        {
+            if (BuyPrice == 0 || SLValue == 0 || TargetValue == 0)
+            {
+                MessageBox.Show("All the three fields are importat", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            decimal one = BuyPrice - SLValue;
+            decimal two = Math.Abs(BuyPrice - TargetValue);
+
+            if (one <= 0)
+            {
+                MessageBox.Show("SL should be less than CMP / Buying Price", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            decimal ratio = two / one;
+
+            BuyPrice = SLValue = TargetValue = 0;
+
+
+            RRRCalculated = ratio;
         }
 
         /// <summary>

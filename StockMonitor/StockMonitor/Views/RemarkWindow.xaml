@@ -9,7 +9,7 @@
         WindowStartupLocation="CenterOwner"
         WindowStyle="SingleBorderWindow"
         ShowInTaskbar="False"
-        Title="RemarkWindow" Height="500" Width="800">
+        Title="RemarkWindow" Height="600" Width="800">
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -33,11 +33,12 @@
         <Grid Grid.Row="1" Margin="0,0,0,15">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Left: Details -->
-            <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Vertical" Grid.Column="0">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Date:  " FontWeight="Bold" Margin="0,0,0,5"/>
                     <TextBlock Text="{Binding CurrentDate, StringFormat=' {0:yyyy-MMM-dd}'}" Margin="0,0,0,5"/>
@@ -52,8 +53,27 @@
                 </StackPanel>
             </StackPanel>
 
+            <StackPanel Orientation="Vertical" Grid.Column="1">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Buy Price:  " FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding BuyPrice, Mode=TwoWay}"  Height="20" Width="100" Margin="0,0,0,5"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="SL:  " FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding SLValue, Mode=TwoWay}"  Height="20" Width="100" Margin="0,0,0,5"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Target:  " FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding TargetValue, Mode=TwoWay}" Height="20" Width="100" Margin="0,0,0,5"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <Button Content="Calculate RRR" Command="{Binding RRRCalculateCommand}" Margin="0,0,10,0" Width="100" Height="20"/>
+                    <TextBlock Text="{Binding RRRCalculated, StringFormat='RRR: 1:{0:F2}'}" Margin="0,10,0,5"/>
+                </StackPanel>
+            </StackPanel>
+
             <!-- Right: Buttons -->
-            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" >
+            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" >
                 <Button Content="Save" Command="{Binding SaveCommand}" Margin="0,0,10,0" Width="100" Height="20"/>
                 <Button Content="Cancel" Click="CancelButton_Click" Width="100" Height="20"/>
             </StackPanel>

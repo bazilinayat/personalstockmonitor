@@ -166,12 +166,10 @@ namespace StockMonitor.ViewModels
         public ICommand SaveCommand { get; }
 
         /// <summary>
-        /// 
+        /// Constructor for the view model to assigne important dependencies
         /// </summary>
-        /// <param name="db"></param>
-        /// <param name="window"></param>
-        /// <param name="option"></param>
-        /// <param name="company"></param>
+        /// <param name="db">DIed DatabaseService</param>
+        /// <param name="logger">DIed Logger</param>
         public SaveResultViewModel(DatabaseService db, ILogger<SaveResultViewModel> logger)
         {
             _db = db;
@@ -188,6 +186,9 @@ namespace StockMonitor.ViewModels
         {
 
             Heading = $"{EnumExtensions.GetDescription(ChartType)} Check for {SelectedCompanyRemark.Name}";
+
+            IsFor = IsAgainst = false;
+            NewComment = "";
 
             switch (ChartType)
             {
@@ -241,6 +242,12 @@ namespace StockMonitor.ViewModels
                             Result = IsFor ? Results.For : Results.Against,
                             ResultRemark = NewComment,
                         });
+
+                        var dailyRemark = await _db.DailyRemarksOperation.GetDailyRemarksBasedOnId(SelectedCompanyRemark.Id);
+                        dailyRemark.IsChecked = true;
+
+                        await _db.DailyRemarksOperation.UpdateDailyRemarkAsync(dailyRemark);
+
                         break;
                     case ChartTypes.Weekly:
                         await _db.WeeklyResultsOperation.SaveWeeklyResultAsync(new WeeklyResults
@@ -250,6 +257,12 @@ namespace StockMonitor.ViewModels
                             Result = IsFor ? Results.For : Results.Against,
                             ResultRemarks = NewComment,
                         });
+
+                        var weeklyRemark = await _db.WeeklyRemarksOperation.GetWeeklyRemarksBasedOnId(SelectedCompanyRemark.Id);
+                        weeklyRemark.IsChecked = true;
+
+                        await _db.WeeklyRemarksOperation.UpdateWeeklyRemarkAsync(weeklyRemark);
+
                         break;
                     case ChartTypes.Monthly:
                         await _db.MonthlyResultsOperation.SaveMonthlyResultAsync(new MonthlyResults
@@ -259,6 +272,12 @@ namespace StockMonitor.ViewModels
                             Result = IsFor ? Results.For : Results.Against,
                             ResultRemarks = NewComment,
                         });
+
+                        var monthlyRemark = await _db.MonthlyRemarksOperation.GetMonthlyRemarksBasedOnId(SelectedCompanyRemark.Id);
+                        monthlyRemark.IsChecked = true;
+
+                        await _db.MonthlyRemarksOperation.UpdateMonthlyRemarkAsync(monthlyRemark);
+
                         break;
                 }
 

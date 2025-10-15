@@ -87,5 +87,19 @@ namespace StockMonitor.DBO
 
             return "Error in saving monthly remark";
         }
+
+        /// <summary>
+        /// Method to update the MonthlyRemark in DB
+        /// </summary>
+        /// <param name="details">MonthlyRemark to be saved</param>
+        /// <returns>Error message string, null on success</returns>
+        public async Task<string?> UpdateMonthlyRemarkAsync(MonthlyRemarks details)
+        {
+
+            if (await _connection.UpdateAsync(details) > 0)
+                return null;
+
+            return "Error in updating monthly remark";
+        }
     }
 }

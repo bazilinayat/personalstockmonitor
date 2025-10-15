@@ -87,5 +87,19 @@ namespace StockMonitor.DBO
 
             return "Error in saving daily remark";
         }
+
+        /// <summary>
+        /// Method to update the DailyRemarks in DB
+        /// </summary>
+        /// <param name="details">DailyRemark to be saved</param>
+        /// <returns>Error message string, null on success</returns>
+        public async Task<string?> UpdateDailyRemarkAsync(DailyRemarks details)
+        {
+
+            if (await _connection.UpdateAsync(details) > 0)
+                return null;
+
+            return "Error in updating daily remark";
+        }
     }
 }

@@ -87,5 +87,19 @@ namespace StockMonitor.DBO
 
             return "Error in saving weekly remark";
         }
+
+        /// <summary>
+        /// Method to update the WeeklyRemark in DB
+        /// </summary>
+        /// <param name="details">WeeklyRemark to be saved</param>
+        /// <returns>Error message string, null on success</returns>
+        public async Task<string?> UpdateWeeklyRemarkAsync(WeeklyRemarks details)
+        {
+
+            if (await _connection.UpdateAsync(details) > 0)
+                return null;
+
+            return "Error in updating weekly remark";
+        }
     }
 }
