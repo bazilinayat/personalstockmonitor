@@ -118,9 +118,9 @@ namespace StockMonitor.ViewModels
         public ICommand RRRCalculateCommand { get; }
 
         /// <summary>
-        /// Command to close window
+        /// Action to close window
         /// </summary>
-        public ICommand CancelCommand { get; }
+        public Action CloseAction { get; set; }
 
         /// <summary>
         /// Constructor for the view model to assigne important dependencies
@@ -259,7 +259,10 @@ namespace StockMonitor.ViewModels
                 }
 
                 if (saveSuccess)
+                {
                     MessageBox.Show("Remarks saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    CloseAction?.Invoke();
+                }
                 else
                     MessageBox.Show("Problem in saving remarks!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }

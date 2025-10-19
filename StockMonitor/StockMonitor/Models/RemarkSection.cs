@@ -87,14 +87,37 @@ namespace StockMonitor.Models
             switch (title)
             {
                 case "Daily":
-                    CheckDate = today.AddDays(1);
+                    if (today.DayOfWeek == DayOfWeek.Friday)
+                        CheckDate = today.AddDays(3);
+                    else
+                        CheckDate = today.AddDays(1);           
                     break;
                 case "Weekly":
-                    int daysUntilEndOfWeek = ((int)DayOfWeek.Sunday - (int)today.DayOfWeek + 7) % 7;
-                    CheckDate = today.AddDays(daysUntilEndOfWeek);
+                    if (today.DayOfWeek == DayOfWeek.Saturday || today.DayOfWeek == DayOfWeek.Sunday)
+                    {
+                        // Upcoming Friday (this week)
+                        int daysUntilFriday = ((int)DayOfWeek.Friday - (int)today.DayOfWeek + 7) % 7;
+                        CheckDate = today.AddDays(daysUntilFriday);
+                    }
+                    else
+                    {
+                        // Friday of next week
+                        int daysUntilFriday = ((int)DayOfWeek.Friday - (int)today.DayOfWeek + 7) % 7;
+                        DateTime thisFriday = today.AddDays(daysUntilFriday);
+                        CheckDate = thisFriday.AddDays(7);
+                    }
+
                     break;
                 case "Monthly":
-                    CheckDate = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
+                    DateTime firstDayNextMonth = new DateTime(today.Year, today.Month, 1).AddMonths(1);
+
+                    // Find the first Monday
+                    DateTime firstMondayNextMonth = firstDayNextMonth;
+                    while (firstMondayNextMonth.DayOfWeek != DayOfWeek.Monday)
+                    {
+                        firstMondayNextMonth = firstMondayNextMonth.AddDays(1);
+                    }
+                    CheckDate = firstMondayNextMonth;
                     break;
             }
 

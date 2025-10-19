@@ -166,6 +166,11 @@ namespace StockMonitor.ViewModels
         public ICommand SaveCommand { get; }
 
         /// <summary>
+        /// Action to close window
+        /// </summary>
+        public Action CloseAction { get; set; }
+
+        /// <summary>
         /// Constructor for the view model to assigne important dependencies
         /// </summary>
         /// <param name="db">DIed DatabaseService</param>
@@ -282,6 +287,7 @@ namespace StockMonitor.ViewModels
                 }
 
                 MessageBox.Show("Result saved successfully", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                CloseAction?.Invoke();
             }
             catch (Exception ex)
             {

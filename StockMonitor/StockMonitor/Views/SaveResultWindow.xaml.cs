@@ -21,6 +21,7 @@ namespace StockMonitor.Views
 
             DataContext = _viewModel;
 
+            _viewModel.CloseAction = () => this.Close();
             Initialize();
         }
 
